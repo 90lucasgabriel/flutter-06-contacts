@@ -8,26 +8,38 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   ContactHelper contactHelper = ContactHelper();
+  List<Contact> contactList = [];
 
   @override
   void initState() {
     super.initState();
 
-    // Contact contact = Contact();
-    // contact.name = 'Lucas Gabriel';
-    // contact.email = '90lucasgabriel@gmail.com';
-    // contact.phone = '119289329';
-    // contact.image = 'imagePath';
-
-    // contactHelper.create(contact);
-
-    contactHelper.query().then((list) {
-      print(list);
-    });
+    contactHelper.query().then((list) => setState(() {
+          contactList = list;
+        }));
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Contacts'),
+        backgroundColor: Colors.red,
+        centerTitle: true,
+      ),
+      backgroundColor: Colors.white,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {},
+        child: Icon(Icons.add),
+        backgroundColor: Colors.red,
+      ),
+      body: ListView.builder(
+        padding: EdgeInsets.all(16),
+        itemCount: contactList.length,
+        itemBuilder: (context, index) {
+          return Text('Name:');
+        },
+      ),
+    );
   }
 }
