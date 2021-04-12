@@ -82,21 +82,21 @@ class _HomePageState extends State<HomePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        contactList[index].name ?? '',
+                        contactList[index].name ?? '-',
                         style: TextStyle(
                           fontSize: 16,
                           color: Colors.black87,
                         ),
                       ),
                       Text(
-                        contactList[index].email ?? '',
+                        contactList[index].email ?? '-',
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.black45,
                         ),
                       ),
                       Text(
-                        contactList[index].phone ?? '',
+                        contactList[index].phone ?? '-',
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.black45,
