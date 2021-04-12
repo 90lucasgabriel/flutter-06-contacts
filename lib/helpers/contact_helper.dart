@@ -1,5 +1,6 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:sqflite/utils/utils.dart';
 
 final String contactTable = 'contactTable';
 final String idColumn = 'idColumn';
@@ -56,10 +57,48 @@ class ContactHelper {
     );
 
     if (response.length > 0) {
-      return Contact.fromMap(response.first);
+      return Contact.toObject(response.first);
     }
 
     return null;
+  }
+
+  Future<int> delete(int id) async {
+    Database dbContact = await db;
+
+    return await dbContact
+        .delete(contactTable, where: '$idColumn = ?', whereArgs: [id]);
+  }
+
+  Future<int> update(Contact contact) async {
+    Database dbContact = await db;
+
+    return await dbContact.update(contactTable, contact.toMap(),
+        where: '$idColumn = ?', whereArgs: [contact.id]);
+  }
+
+  Future<List<Contact>> query() async {
+    Database dbContact = await db;
+    List<Map> responseMap = await dbContact.query(contactTable);
+    List<Contact> contactList = [];
+
+    responseMap.forEach((contact) {
+      contactList.add(Contact.toObject(contact));
+    });
+
+    return contactList;
+  }
+
+  Future<int> count() async {
+    Database dbContact = await db;
+
+    return Sqflite.firstIntValue(
+        await dbContact.rawQuery('SELECT COUNT(*) FROM $contactTable'));
+  }
+
+  Future close() async {
+    Database dbContact = await db;
+    dbContact.close();
   }
 }
 
@@ -70,7 +109,7 @@ class Contact {
   String phone;
   String image;
 
-  Contact.fromMap(Map map) {
+  Contact.toObject(Map map) {
     id = map[idColumn];
     name = map[nameColumn];
     email = map[emailColumn];
