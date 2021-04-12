@@ -25,7 +25,7 @@ class ContactHelper {
 
   Future<Database> initDb() async {
     final databasesPath = await getDatabasesPath();
-    final path = join(databasesPath, 'contacts.db');
+    final path = join(databasesPath, 'contacts_flutter.db');
 
     return await openDatabase(path, version: 1,
         onCreate: (Database db, int newerVersion) async {
@@ -109,6 +109,8 @@ class Contact {
   String phone;
   String image;
 
+  Contact();
+
   Contact.toObject(Map map) {
     id = map[idColumn];
     name = map[nameColumn];
@@ -134,6 +136,6 @@ class Contact {
 
   @override
   String toString() {
-    return 'Contact(id: $id, name: $name, email: $email, phone: $phone)';
+    return 'Contact(id: $id, name: $name, email: $email, phone: $phone, image: $image)';
   }
 }
