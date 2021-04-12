@@ -38,6 +38,29 @@ class ContactHelper {
         ''');
     });
   }
+
+  Future<Contact> create(Contact contact) async {
+    Database dbContact = await db;
+    contact.id = await dbContact.insert(contactTable, contact.toMap());
+
+    return contact;
+  }
+
+  Future<Contact> get(int id) async {
+    Database dbContact = await db;
+    List<Map> response = await dbContact.query(
+      contactTable,
+      columns: [idColumn, nameColumn, emailColumn, phoneColumn, imageColumn],
+      where: '$idColumn = ?',
+      whereArgs: [id],
+    );
+
+    if (response.length > 0) {
+      return Contact.fromMap(response.first);
+    }
+
+    return null;
+  }
 }
 
 class Contact {
