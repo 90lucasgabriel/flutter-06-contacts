@@ -136,6 +136,6 @@ class Contact {
 
   @override
   String toString() {
-    return 'Contact(id: $id, name: $name, email: $email, phone: $phone)';
+    return 'Contact(id: $id, name: $name, email: $email, phone: $phone, image: $image)';
   }
 }
