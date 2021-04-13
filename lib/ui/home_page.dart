@@ -27,7 +27,6 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: Text('Contacts'),
         backgroundColor: Colors.red,
-        centerTitle: true,
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
