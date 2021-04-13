@@ -65,14 +65,21 @@ class _HomePageState extends State<HomePage> {
                       : null,
                 ),
                 child: Center(
-                  child: Text(
-                    contactList[index].name.toUpperCase().substring(0, 1),
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 32,
-                      fontWeight: FontWeight.w100,
-                    ),
-                  ),
+                  child: contactList[index].name != null &&
+                          contactList[index].name.isNotEmpty
+                      ? Text(
+                          contactList[index].name.toUpperCase().substring(0, 1),
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 32,
+                            fontWeight: FontWeight.w100,
+                          ),
+                        )
+                      : Icon(
+                          Icons.person,
+                          color: Colors.white,
+                          size: 100,
+                        ),
                 ),
               ),
               Expanded(
