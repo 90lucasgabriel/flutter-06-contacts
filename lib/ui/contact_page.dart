@@ -20,6 +20,8 @@ class _ContactPageState extends State<ContactPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
 
+  final FocusNode _nameFocus = FocusNode();
+
   @override
   void initState() {
     super.initState();
@@ -42,72 +44,81 @@ class _ContactPageState extends State<ContactPage> {
         backgroundColor: Colors.red,
         title: Text(_contact.name ?? 'New Contact'),
       ),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          children: <Widget>[
+            Container(
+              height: 140,
+              width: 140,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.red,
+                image: _contact.image != null
+                    ? DecorationImage(image: FileImage(File(_contact.image)))
+                    : null,
+              ),
+              child: Center(
+                child: _contact.name != null && _contact.name.isNotEmpty
+                    ? Text(
+                        _contact.name.toUpperCase().substring(0, 1),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 80,
+                          fontWeight: FontWeight.w100,
+                        ),
+                      )
+                    : Icon(
+                        Icons.person,
+                        color: Colors.white,
+                        size: 100,
+                      ),
+              ),
+            ),
+            TextField(
+              controller: _nameController,
+              focusNode: _nameFocus,
+              decoration: InputDecoration(labelText: 'Nome'),
+              onChanged: (value) {
+                _hasChanges = true;
+                setState(() {
+                  _contact.name = value;
+                });
+              },
+            ),
+            TextField(
+              controller: _emailController,
+              decoration: InputDecoration(labelText: 'E-mail'),
+              keyboardType: TextInputType.emailAddress,
+              onChanged: (value) {
+                _hasChanges = true;
+                _contact.email = value;
+              },
+            ),
+            TextField(
+              controller: _phoneController,
+              decoration: InputDecoration(labelText: 'Phone'),
+              keyboardType: TextInputType.phone,
+              onChanged: (value) {
+                _hasChanges = true;
+                _contact.phone = value;
+              },
+            )
+          ],
+        ),
+      ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
         child: Icon(Icons.save),
         backgroundColor: Colors.red,
+        onPressed: () {
+          if (_contact.name != null && _contact.name.isNotEmpty) {
+            Navigator.pop(context, _contact);
+            return;
+          }
+
+          FocusScope.of(context).requestFocus(_nameFocus);
+        },
       ),
-      body: SingleChildScrollView(
-          padding: EdgeInsets.all(16),
-          child: Column(
-            children: <Widget>[
-              Container(
-                height: 140,
-                width: 140,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.red,
-                  image: _contact.image != null
-                      ? DecorationImage(image: FileImage(File(_contact.image)))
-                      : null,
-                ),
-                child: Center(
-                  child: _contact.name != null && _contact.name.isNotEmpty
-                      ? Text(
-                          _contact.name.toUpperCase().substring(0, 1),
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 80,
-                            fontWeight: FontWeight.w100,
-                          ),
-                        )
-                      : Icon(
-                          Icons.person,
-                          color: Colors.white,
-                          size: 100,
-                        ),
-                ),
-              ),
-              TextField(
-                controller: _nameController,
-                decoration: InputDecoration(labelText: 'Nome'),
-                onChanged: (value) {
-                  _hasChanges = true;
-                  setState(() {
-                    _contact.name = value;
-                  });
-                },
-              ),
-              TextField(
-                controller: _emailController,
-                decoration: InputDecoration(labelText: 'E-mail'),
-                keyboardType: TextInputType.emailAddress,
-                onChanged: (value) {
-                  _hasChanges = true;
-                  _contact.email = value;
-                },
-              ),
-              TextField(
-                controller: _phoneController,
-                decoration: InputDecoration(labelText: 'Phone'),
-                keyboardType: TextInputType.phone,
-                onChanged: (value) {
-                  _hasChanges = true;
-                  _contact.phone = value;
-                },
-              )
-            ],
-          )),
     );
   }
 }
