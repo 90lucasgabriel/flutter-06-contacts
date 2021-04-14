@@ -22,6 +22,38 @@ class _ContactPageState extends State<ContactPage> {
 
   final FocusNode _nameFocus = FocusNode();
 
+  Future<bool> _handlePop() {
+    if (_hasChanges) {
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text("Discard changes?"),
+              content: Text('If you confirm, all changes will be lost.'),
+              actions: [
+                TextButton(
+                  child: Text('Cancel'),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                TextButton(
+                  child: Text('OK'),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            );
+          });
+
+      return Future.value(false);
+    }
+
+    return Future.value(true);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -39,86 +71,89 @@ class _ContactPageState extends State<ContactPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.red,
-        title: Text(_contact.name ?? 'New Contact'),
-      ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          children: <Widget>[
-            Container(
-              height: 140,
-              width: 140,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.red,
-                image: _contact.image != null
-                    ? DecorationImage(image: FileImage(File(_contact.image)))
-                    : null,
-              ),
-              child: Center(
-                child: _contact.name != null && _contact.name.isNotEmpty
-                    ? Text(
-                        _contact.name.toUpperCase().substring(0, 1),
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 80,
-                          fontWeight: FontWeight.w100,
-                        ),
-                      )
-                    : Icon(
-                        Icons.person,
-                        color: Colors.white,
-                        size: 100,
-                      ),
-              ),
+    return WillPopScope(
+        child: Scaffold(
+          appBar: AppBar(
+            backgroundColor: Colors.red,
+            title: Text(_contact.name ?? 'New Contact'),
+          ),
+          body: SingleChildScrollView(
+            padding: EdgeInsets.all(16),
+            child: Column(
+              children: <Widget>[
+                Container(
+                  height: 140,
+                  width: 140,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.red,
+                    image: _contact.image != null
+                        ? DecorationImage(
+                            image: FileImage(File(_contact.image)))
+                        : null,
+                  ),
+                  child: Center(
+                    child: _contact.name != null && _contact.name.isNotEmpty
+                        ? Text(
+                            _contact.name.toUpperCase().substring(0, 1),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 80,
+                              fontWeight: FontWeight.w100,
+                            ),
+                          )
+                        : Icon(
+                            Icons.person,
+                            color: Colors.white,
+                            size: 100,
+                          ),
+                  ),
+                ),
+                TextField(
+                  controller: _nameController,
+                  focusNode: _nameFocus,
+                  decoration: InputDecoration(labelText: 'Nome'),
+                  onChanged: (value) {
+                    _hasChanges = true;
+                    setState(() {
+                      _contact.name = value;
+                    });
+                  },
+                ),
+                TextField(
+                  controller: _emailController,
+                  decoration: InputDecoration(labelText: 'E-mail'),
+                  keyboardType: TextInputType.emailAddress,
+                  onChanged: (value) {
+                    _hasChanges = true;
+                    _contact.email = value;
+                  },
+                ),
+                TextField(
+                  controller: _phoneController,
+                  decoration: InputDecoration(labelText: 'Phone'),
+                  keyboardType: TextInputType.phone,
+                  onChanged: (value) {
+                    _hasChanges = true;
+                    _contact.phone = value;
+                  },
+                )
+              ],
             ),
-            TextField(
-              controller: _nameController,
-              focusNode: _nameFocus,
-              decoration: InputDecoration(labelText: 'Nome'),
-              onChanged: (value) {
-                _hasChanges = true;
-                setState(() {
-                  _contact.name = value;
-                });
-              },
-            ),
-            TextField(
-              controller: _emailController,
-              decoration: InputDecoration(labelText: 'E-mail'),
-              keyboardType: TextInputType.emailAddress,
-              onChanged: (value) {
-                _hasChanges = true;
-                _contact.email = value;
-              },
-            ),
-            TextField(
-              controller: _phoneController,
-              decoration: InputDecoration(labelText: 'Phone'),
-              keyboardType: TextInputType.phone,
-              onChanged: (value) {
-                _hasChanges = true;
-                _contact.phone = value;
-              },
-            )
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.save),
-        backgroundColor: Colors.red,
-        onPressed: () {
-          if (_contact.name != null && _contact.name.isNotEmpty) {
-            Navigator.pop(context, _contact);
-            return;
-          }
+          ),
+          floatingActionButton: FloatingActionButton(
+            child: Icon(Icons.save),
+            backgroundColor: Colors.red,
+            onPressed: () {
+              if (_contact.name != null && _contact.name.isNotEmpty) {
+                Navigator.pop(context, _contact);
+                return;
+              }
 
-          FocusScope.of(context).requestFocus(_nameFocus);
-        },
-      ),
-    );
+              FocusScope.of(context).requestFocus(_nameFocus);
+            },
+          ),
+        ),
+        onWillPop: _handlePop);
   }
 }
