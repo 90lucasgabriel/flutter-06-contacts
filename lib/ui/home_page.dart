@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:io';
 
 import 'package:contacts/helpers/contact_helper.dart';
+import 'package:contacts/ui/contact_page.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -12,13 +13,17 @@ class _HomePageState extends State<HomePage> {
   ContactHelper contactHelper = ContactHelper();
   List<Contact> contactList = [];
 
+  void _queryContacts() {
+    contactHelper.query().then((list) => setState(() {
+          contactList = list;
+        }));
+  }
+
   @override
   void initState() {
     super.initState();
 
-    contactHelper.query().then((list) => setState(() {
-          contactList = list;
-        }));
+    _queryContacts();
   }
 
   @override
@@ -29,7 +34,9 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Colors.red,
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          _navigateToContactPage();
+        },
         child: Icon(Icons.add),
         backgroundColor: Colors.red,
       ),
@@ -44,7 +51,11 @@ class _HomePageState extends State<HomePage> {
 
   Widget _contactCard(BuildContext context, int index) {
     return InkWell(
-      onTap: () {},
+      onTap: () {
+        _navigateToContactPage(
+          contact: contactList[index],
+        );
+      },
       child: Ink(
         color: Colors.white,
         child: Column(children: [
@@ -118,5 +129,28 @@ class _HomePageState extends State<HomePage> {
         ]),
       ),
     );
+  }
+
+  void _navigateToContactPage({Contact contact}) async {
+    final response = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ContactPage(
+          selectedContact: contact,
+        ),
+      ),
+    );
+
+    if (response == null) {
+      return;
+    }
+
+    if (contact != null) {
+      await contactHelper.update(response);
+    } else {
+      await contactHelper.create(response);
+    }
+
+    _queryContacts();
   }
 }
