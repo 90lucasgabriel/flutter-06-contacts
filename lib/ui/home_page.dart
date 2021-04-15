@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:contacts/helpers/contact_helper.dart';
 import 'package:contacts/ui/contact_page.dart';
@@ -42,6 +43,13 @@ class _HomePageState extends State<HomePage> {
     _queryContacts();
   }
 
+  @override
+  void initState() {
+    super.initState();
+
+    _queryContacts();
+  }
+
   void _handleOptions(BuildContext context, int index) {
     showModalBottomSheet(
       context: context,
@@ -54,23 +62,45 @@ class _HomePageState extends State<HomePage> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  TextButton(
-                    style: ButtonStyle(
-                        padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-                            EdgeInsets.all(16))),
-                    child: Text(
-                      'Ligar',
-                      style: TextStyle(color: Colors.red, fontSize: 16),
+                  if (contactList[index].phone != null)
+                    TextButton(
+                      style: ButtonStyle(
+                          padding:
+                              MaterialStateProperty.all<EdgeInsetsGeometry>(
+                                  EdgeInsets.all(16))),
+                      child: Text(
+                        'Call',
+                        style: TextStyle(color: Colors.red, fontSize: 16),
+                      ),
+                      onPressed: () {
+                        launch('tel:${contactList[index].phone}');
+                        Navigator.pop(context);
+                      },
                     ),
-                    onPressed: () {},
-                  ),
+                  Divider(height: 0),
+                  if (contactList[index].email != null ||
+                      contactList[index].email.length > 0)
+                    TextButton(
+                      style: ButtonStyle(
+                          padding:
+                              MaterialStateProperty.all<EdgeInsetsGeometry>(
+                                  EdgeInsets.all(16))),
+                      child: Text(
+                        'Send email',
+                        style: TextStyle(color: Colors.red, fontSize: 16),
+                      ),
+                      onPressed: () {
+                        launch('mailto:${contactList[index].email}');
+                        Navigator.pop(context);
+                      },
+                    ),
                   Divider(height: 0),
                   TextButton(
                     style: ButtonStyle(
                         padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
                             EdgeInsets.all(16))),
                     child: Text(
-                      'Editar',
+                      'Edit',
                       style: TextStyle(color: Colors.red, fontSize: 16),
                     ),
                     onPressed: () {
@@ -86,7 +116,7 @@ class _HomePageState extends State<HomePage> {
                         padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
                             EdgeInsets.all(16))),
                     child: Text(
-                      'Excluir',
+                      'Remove',
                       style: TextStyle(color: Colors.red, fontSize: 16),
                     ),
                     onPressed: () {
@@ -104,13 +134,6 @@ class _HomePageState extends State<HomePage> {
         );
       },
     );
-  }
-
-  @override
-  void initState() {
-    super.initState();
-
-    _queryContacts();
   }
 
   Widget _contactCard(BuildContext context, int index) {
@@ -143,7 +166,9 @@ class _HomePageState extends State<HomePage> {
                       ? Text(
                           contactList[index].name.toUpperCase().substring(0, 1),
                           style: TextStyle(
-                            color: Colors.white,
+                            color: contactList[index].image != null
+                                ? Colors.transparent
+                                : Colors.white,
                             fontSize: 32,
                             fontWeight: FontWeight.w100,
                           ),
