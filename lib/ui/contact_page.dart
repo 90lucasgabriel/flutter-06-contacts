@@ -91,7 +91,9 @@ class _ContactPageState extends State<ContactPage> {
                       color: Colors.red,
                       image: _contact.image != null
                           ? DecorationImage(
-                              image: FileImage(File(_contact.image)))
+                              image: FileImage(File(_contact.image)),
+                              fit: BoxFit.cover,
+                            )
                           : null,
                     ),
                     child: Center(
