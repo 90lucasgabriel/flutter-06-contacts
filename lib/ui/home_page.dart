@@ -5,6 +5,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:contacts/helpers/contact_helper.dart';
 import 'package:contacts/ui/contact_page.dart';
 
+enum SortOptions { SORT_AZ, SORT_ZA }
+
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
@@ -18,6 +20,23 @@ class _HomePageState extends State<HomePage> {
     contactHelper.query().then((list) => setState(() {
           contactList = list;
         }));
+  }
+
+  void _handleSort(SortOptions value) {
+    switch (value) {
+      case SortOptions.SORT_AZ:
+        contactList.sort((a, b) {
+          return a.name.toLowerCase().compareTo(b.name.toLowerCase());
+        });
+
+        break;
+      case SortOptions.SORT_ZA:
+        contactList.sort((a, b) {
+          return b.name.toLowerCase().compareTo(a.name.toLowerCase());
+        });
+        break;
+    }
+    setState(() {});
   }
 
   void _navigateToContactPage({Contact contact}) async {
@@ -39,13 +58,6 @@ class _HomePageState extends State<HomePage> {
     } else {
       await contactHelper.create(response);
     }
-
-    _queryContacts();
-  }
-
-  @override
-  void initState() {
-    super.initState();
 
     _queryContacts();
   }
@@ -78,8 +90,7 @@ class _HomePageState extends State<HomePage> {
                       },
                     ),
                   Divider(height: 0),
-                  if (contactList[index].email != null ||
-                      contactList[index].email.length > 0)
+                  if (contactList[index].email != null)
                     TextButton(
                       style: ButtonStyle(
                           padding:
@@ -136,6 +147,13 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  @override
+  void initState() {
+    super.initState();
+
+    _queryContacts();
+  }
+
   Widget _contactCard(BuildContext context, int index) {
     return InkWell(
       onTap: () {
@@ -157,7 +175,9 @@ class _HomePageState extends State<HomePage> {
                   color: Colors.red,
                   image: contactList[index].image != null
                       ? DecorationImage(
-                          image: FileImage(File(contactList[index].image)))
+                          image: FileImage(File(contactList[index].image)),
+                          fit: BoxFit.cover,
+                        )
                       : null,
                 ),
                 child: Center(
@@ -222,9 +242,19 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Contacts'),
-        backgroundColor: Colors.red,
-      ),
+          title: Text('Contacts'),
+          backgroundColor: Colors.red,
+          actions: [
+            PopupMenuButton<SortOptions>(
+              itemBuilder: (context) => <PopupMenuEntry<SortOptions>>[
+                const PopupMenuItem<SortOptions>(
+                    child: Text('Sort (A-Z)'), value: SortOptions.SORT_AZ),
+                const PopupMenuItem<SortOptions>(
+                    child: Text('Sort (Z-A)'), value: SortOptions.SORT_ZA),
+              ],
+              onSelected: _handleSort,
+            ),
+          ]),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           _navigateToContactPage();
