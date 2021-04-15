@@ -19,6 +19,93 @@ class _HomePageState extends State<HomePage> {
         }));
   }
 
+  void _navigateToContactPage({Contact contact}) async {
+    final response = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ContactPage(
+          selectedContact: contact,
+        ),
+      ),
+    );
+
+    if (response == null) {
+      return;
+    }
+
+    if (contact != null) {
+      await contactHelper.update(response);
+    } else {
+      await contactHelper.create(response);
+    }
+
+    _queryContacts();
+  }
+
+  void _handleOptions(BuildContext context, int index) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return BottomSheet(
+          onClosing: () {},
+          builder: (context) {
+            return Container(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  TextButton(
+                    style: ButtonStyle(
+                        padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                            EdgeInsets.all(16))),
+                    child: Text(
+                      'Ligar',
+                      style: TextStyle(color: Colors.red, fontSize: 16),
+                    ),
+                    onPressed: () {},
+                  ),
+                  Divider(height: 0),
+                  TextButton(
+                    style: ButtonStyle(
+                        padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                            EdgeInsets.all(16))),
+                    child: Text(
+                      'Editar',
+                      style: TextStyle(color: Colors.red, fontSize: 16),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _navigateToContactPage(
+                        contact: contactList[index],
+                      );
+                    },
+                  ),
+                  Divider(height: 0),
+                  TextButton(
+                    style: ButtonStyle(
+                        padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                            EdgeInsets.all(16))),
+                    child: Text(
+                      'Excluir',
+                      style: TextStyle(color: Colors.red, fontSize: 16),
+                    ),
+                    onPressed: () {
+                      contactHelper.delete(contactList[index].id);
+                      setState(() {
+                        contactList.removeAt(index);
+                      });
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -26,35 +113,10 @@ class _HomePageState extends State<HomePage> {
     _queryContacts();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Contacts'),
-        backgroundColor: Colors.red,
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _navigateToContactPage();
-        },
-        child: Icon(Icons.add),
-        backgroundColor: Colors.red,
-      ),
-      body: ListView.builder(
-        itemCount: contactList.length,
-        itemBuilder: (context, index) {
-          return _contactCard(context, index);
-        },
-      ),
-    );
-  }
-
   Widget _contactCard(BuildContext context, int index) {
     return InkWell(
       onTap: () {
-        _navigateToContactPage(
-          contact: contactList[index],
-        );
+        _handleOptions(context, index);
       },
       child: Ink(
         color: Colors.white,
@@ -131,26 +193,26 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void _navigateToContactPage({Contact contact}) async {
-    final response = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ContactPage(
-          selectedContact: contact,
-        ),
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Contacts'),
+        backgroundColor: Colors.red,
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          _navigateToContactPage();
+        },
+        child: Icon(Icons.add),
+        backgroundColor: Colors.red,
+      ),
+      body: ListView.builder(
+        itemCount: contactList.length,
+        itemBuilder: (context, index) {
+          return _contactCard(context, index);
+        },
       ),
     );
-
-    if (response == null) {
-      return;
-    }
-
-    if (contact != null) {
-      await contactHelper.update(response);
-    } else {
-      await contactHelper.create(response);
-    }
-
-    _queryContacts();
   }
 }
