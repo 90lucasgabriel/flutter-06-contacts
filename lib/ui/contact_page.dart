@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 
 import 'package:contacts/helpers/contact_helper.dart';
 
@@ -81,33 +82,47 @@ class _ContactPageState extends State<ContactPage> {
             padding: EdgeInsets.all(16),
             child: Column(
               children: <Widget>[
-                Container(
-                  height: 140,
-                  width: 140,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.red,
-                    image: _contact.image != null
-                        ? DecorationImage(
-                            image: FileImage(File(_contact.image)))
-                        : null,
-                  ),
-                  child: Center(
-                    child: _contact.name != null && _contact.name.isNotEmpty
-                        ? Text(
-                            _contact.name.toUpperCase().substring(0, 1),
-                            style: TextStyle(
+                GestureDetector(
+                  child: Container(
+                    height: 140,
+                    width: 140,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.red,
+                      image: _contact.image != null
+                          ? DecorationImage(
+                              image: FileImage(File(_contact.image)))
+                          : null,
+                    ),
+                    child: Center(
+                      child: _contact.name != null && _contact.name.isNotEmpty
+                          ? Text(
+                              _contact.name.toUpperCase().substring(0, 1),
+                              style: TextStyle(
+                                color: _contact.image != null
+                                    ? Colors.transparent
+                                    : Colors.white,
+                                fontSize: 80,
+                                fontWeight: FontWeight.w100,
+                              ),
+                            )
+                          : Icon(
+                              Icons.person,
                               color: Colors.white,
-                              fontSize: 80,
-                              fontWeight: FontWeight.w100,
+                              size: 100,
                             ),
-                          )
-                        : Icon(
-                            Icons.person,
-                            color: Colors.white,
-                            size: 100,
-                          ),
+                    ),
                   ),
+                  onTap: () async {
+                    final ImagePicker _picker = ImagePicker();
+                    final response =
+                        await _picker.getImage(source: ImageSource.gallery);
+
+                    if (response == null) return;
+                    setState(() {
+                      _contact.image = response.path;
+                    });
+                  },
                 ),
                 TextField(
                   controller: _nameController,
